@@ -5,15 +5,18 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.movietracker.R
 import com.example.movietracker.adapter.MovieAdapter
 import com.example.movietracker.model.Movie
+import com.example.movietracker.viewmodel.SharedViewModel
 
 class WatchlistFragment : Fragment() {
     private lateinit var movieRecyclerView: RecyclerView
     private lateinit var movieAdapter: MovieAdapter
+    private val sharedViewModel: SharedViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,14 +31,11 @@ class WatchlistFragment : Fragment() {
         movieRecyclerView = view.findViewById(R.id.recyclerViewMovies)
         movieRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        // Sample movie list
-        val movieList = listOf(
-            Movie("Inception", 2010, "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_FMjpg_UX700_.jpg"),
-            Movie("The Dark Knight", 2008, "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg"),
-            Movie("Interstellar", 2014, "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg")
-        )
-
-        movieAdapter = MovieAdapter(movieList)
+        movieAdapter = MovieAdapter(emptyList(), sharedViewModel)
         movieRecyclerView.adapter = movieAdapter
+
+        sharedViewModel.watchlist.observe(viewLifecycleOwner) { movies ->
+            movieAdapter.updateMovies(movies)
+        }
     }
 }
